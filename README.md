@@ -1,1 +1,1 @@
-# site-dpc-lite
+# opscenter-sitedoc-lite
