@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SiteDoc Repository
 
-## Getting Started
+This repository now contains a GUI-first migration from the AI-generated frontend into the real Next.js app under `sitedoc/`.
 
-First, run the development server:
+## Frontend structure (GUI foundation)
+
+The app uses a feature-based organization:
+
+- `sitedoc/src/app/`: thin route layer (one page file per screen)
+- `sitedoc/src/components/layout/`: app shell and navigation
+- `sitedoc/src/components/shared/`: generic reusable UI blocks
+- `sitedoc/src/features/<feature>/`: each screen/feature owns
+  - `components/` (page view and UI pieces)
+  - `mocks/` (typed mock data)
+  - `types/` (feature-local interfaces)
+  - `index.ts` (feature entrypoint)
+
+## Migrated GUI screens
+
+All major AI-export screens are now represented and navigable in Next.js:
+
+- Dashboard
+- Getting Started
+- Site Info
+- Services
+- Phone Numbers
+- Racks Information
+- Equipment Not On Rack
+- Inventory
+- Layouts Hub
+- Connections Hub
+- Antennas Hub
+- General Diagram
+- CSC Audit
+- Generate Report
+- Master Data
+
+## Mock data policy (current phase)
+
+This phase is intentionally mock-driven:
+
+- Mock data is typed and stored inside each feature under `mocks/`
+- No API routes, DB access, auth, server actions, or domain orchestration were introduced
+- Buttons/workflows are placeholder UI behavior ready for later backend integration
+
+## How to continue from this base
+
+1. Keep route files thin and delegate to feature page views.
+2. Add/extend mock types and mocks inside each feature first.
+3. When backend integration starts, replace feature mocks incrementally with real data-fetching boundaries.
+4. Keep shared UI generic (`src/components/shared`) and avoid moving feature-specific code out of feature folders.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+cd sitedoc
 pnpm dev
-# or
-bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

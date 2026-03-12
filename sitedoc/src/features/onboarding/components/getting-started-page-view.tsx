@@ -1,0 +1,4 @@
+import { PageHeader } from "@/src/components/shared/page-header";
+import { SectionCard } from "@/src/components/shared/section-card";
+import { onboardingSteps } from "@/src/features/onboarding/mocks/onboarding.mocks";
+export function GettingStartedPageView() { return <div><PageHeader title="Getting Started" subtitle="Use this GUI foundation to review every workflow screen." phase="Workspace" /><SectionCard title="Initial flow" description="Mock guidance only."><ol className="space-y-3">{onboardingSteps.map((step, i)=><li key={step.title} className="rounded border border-slate-200 p-3"><p className="font-semibold">{i+1}. {step.title}</p><p className="text-sm text-slate-600">{step.description}</p><p className="text-xs text-slate-500">Owner: {step.owner}</p></li>)}</ol></SectionCard></div>; }
