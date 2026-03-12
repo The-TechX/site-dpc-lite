@@ -1,0 +1,311 @@
+You are designing a responsive web application that replaces a technical Excel “Site Document” with a modern, guided web workflow for data entry, validation, automation, and report generation.
+
+CRITICAL DESIGN SYSTEM REQUIREMENT:
+- Use the full Beam 3 component library (internal template) exclusively for ALL UI elements.
+- Do not create custom components unless Beam 3 lacks an equivalent. If so, extend Beam 3 styles/tokens only (typography, spacing, colors, elevation, radii).
+- Apply Beam 3 patterns for: navigation, stepper/wizard, tables, forms, validation, empty states, modals, toasts, file uploads, tags/chips, progress indicators, and role-based UI states.
+
+PRODUCT GOAL:
+Convert the following Excel tabs into web modules with structured data, uploads, drag-and-drop layouts, and automated report-ready outputs:
+Getting Started, 0.LogBook, 1.Site Info, 1.1 Services, 2.Phone Numbers, 3.Rack’s Info, 3.1 Rack Location Layout, 3.2 Equipment not on Rack, 4.Inventory Table, 4.1 Switches Layout, 4.2 Patch Panel Layout, 4.3 PDU/UPS Layout, 4.4 OBM Layout, 5.Antennas Photo, 5.1 Antennas Location Layout, 5.2 Antennas Location Layout (Optional), 5.3 Blockage Zone, 6.General Diagram, 7.Antennas Config, 8.CSC Audit, Generate/Report. 
+
+========================================================
+1) INFORMATION ARCHITECTURE & GLOBAL NAVIGATION (Beam 3)
+========================================================
+Create a desktop-first app (fully usable on tablet/mobile) with:
+
+A. Top App Bar (Beam 3)
+- Site selector (Customer + Rig/Vessel) + document status badge (Draft / In Review / Final).
+- Global “Completion %” indicator + last saved timestamp.
+- Primary actions: “Generate Report”, “Export”, “Share/Permissions”.
+- Secondary actions in overflow: “Audit log”, “Reset section”, “Help”.
+
+B. Left Sidebar (Beam 3)
+- Vertical stepper / section navigator listing all modules in order.
+- Each item shows: status icon (Not started / In progress / Completed / Blocked) and a mini %.
+- Clicking a section navigates directly to it.
+- Provide “Continue” and “Back” buttons at the bottom of every page.
+
+C. Autosave + Change Tracking
+- Autosave per field; show Beam 3 inline “Saving…” then “Saved” state.
+- Maintain a field-level audit trail (who/when/what changed) accessible from a side panel.
+
+D. Role-based Access (Beam 3 permission patterns)
+Roles: PM/PC, Field Engineer, CSC, Viewer.
+- Each section must show who is responsible (“Owner role”) and apply: editable vs read-only.
+- Read-only users can leave comments/notes if allowed.
+
+========================================================
+2) DESIGN PRINCIPLES (Beam 3 tokens & patterns)
+========================================================
+- Use Beam 3 layout grid, spacing scale, typography scale, and color tokens.
+- Accessibility: WCAG AA contrast, keyboard focus rings, ARIA labels, error summaries.
+- Consistent empty states, loading states, and error states using Beam 3 components.
+- Avoid dense Excel-like layouts; use progressive disclosure and sensible grouping.
+
+========================================================
+3) MODULES (ONE PER EXCEL TAB) — DETAILED REQUIREMENTS
+========================================================
+
+A) Getting Started (Welcome / Guidance)
+- Welcome page with Beam 3 cards for each role (PM/PC, FE, CSC).
+- Each card lists what that role fills out in the app.
+- Include a “How this works” mini flow: Fill → Validate → Generate Report.
+- Provide a “Start” button that jumps to the first incomplete section.
+
+B) 0. LogBook (Internal Logbook)
+- Beam 3 data table with inline editing, filtering, sorting.
+Columns:
+- Ticket
+- Viasat Representative
+- FE Pending Activities
+- Status (Pending / Completed / Canceled)
+- Comments from PC/PM
+- Timeline entries: Date + Name + Comment (view as expandable row or modal)
+Features:
+- Add row, edit row, attach evidence (images/PDF), filter by status, search by ticket.
+- Ticket detail modal showing chronological comment timeline and attachments.
+
+C) 1. Site Info (General Site Information)
+Beam 3 form with clear sections:
+1) Customer & Site
+- Customer (combobox, supports “Other…”)
+- Customer logo upload (image)
+- Rig/Vessel name (text)
+- Rig/Vessel photo upload (image)
+- Country (combobox) + Location (text)
+- Date (date picker) + Ticket (text)
+2) Project Stakeholders
+- Project Manager/Coordinator name + email
+- Field Engineer name + email
+- Sales Account Manager name + email
+- Service Delivery Manager name + email (optional)
+- Service Delivery Engineer name + email (optional)
+3) Customer POC
+- IT Representative name + email
+- IT Manager name + email
+- Additional POCs: repeatable group with “Add POC” / “Remove POC”
+Validation:
+- Required fields marked, inline email validation, date must be present.
+
+D) 1.1 Services (Services Onboard)
+- List of service cards with “Add service” CTA (Beam 3).
+Each service includes:
+- Service Type (KU / KA / C / LTE / OneWeb / Starlink)
+- System Type (Single / Dual)
+- Antenna System (searchable combobox from catalog + “Other…”)
+- BUC power (W) (numeric)
+- Bandwidth (Down/Up) (numeric + units)
+- Satellite / Constellation (searchable combobox)
+- Provided by (Viasat / Vendor / Other)
+Actions:
+- Add, duplicate, remove service.
+Rules:
+- At least one service must exist before report generation is enabled.
+
+E) 2. Phone Numbers
+Top controls:
+- Does Viasat manage voice services? (Yes/No)
+- Country (combobox) → auto-fills International Dial Code field
+- Does it have a main phone with extension? (Yes/No)
+  - If Yes: Main Number + Extension fields
+Phone Number List:
+- Beam 3 table (max 20 rows)
+Columns: ID (auto), Phone Number, Assigned To
+Backup Phone Numbers section:
+- OBM Master Number
+- OBM Data Number
+- SIM card number(s)
+- FBB Phone + SIM
+- Sat Phone numbers (repeatable list)
+Validation:
+- Enforce maximum 20 phone numbers.
+- Phone formatting hints based on dial code.
+
+F) 3. Rack’s Information
+- Beam 3 table for racks with inline edit + row details panel.
+Fields per rack:
+- Rack ID
+- Rack Size (U) (combobox: 9U…52U)
+- Vessel/Rig Location (text)
+- Room (text)
+- Front View photo upload
+- Rear View photo upload
+Rules:
+- Minimum required: Rack ID, size, location, room; at least one photo recommended (flag missing photos).
+
+G) 3.1 Rack Location Layout (Drag-and-drop over a site drawing)
+- Canvas workspace:
+  - Upload “Rig/Vessel drawing” image (plan view).
+  - Right panel lists all racks (from Rack’s Info).
+- Drag a rack pin (with label “Rack ID”) onto the drawing.
+- Pin can rotate (angle control) and be repositioned.
+- Store normalized X/Y coordinates and rotation.
+- Provide “Reset layout” action and “Snap to grid” toggle.
+
+H) 3.2 Equipment not on Rack (Optional)
+- Beam 3 table with:
+  - NON-Rack ID
+  - Vessel/Rig Location
+  - Room
+  - Photo upload (front view)
+- If section is empty, show Beam 3 empty state: “No off-rack equipment added.”
+
+I) 4. Inventory Table (Source of truth)
+- Beam 3 advanced data table with:
+Columns:
+- Owner (Viasat / Customer / Other)
+- Device Name
+- Network ID
+- Model (catalog combobox + “Other…”)
+- Serial #
+- MAC Address
+- Rack ID (links to racks)
+- Rack Unit # (numeric)
+- Is not on rack? (toggle)
+- If not on rack: Location text field
+- Comments
+Features:
+- Import CSV/XLSX (optional UI) and map columns.
+- Row validation badges (missing required fields, invalid MAC format).
+Rules:
+- Inventory drives downstream layouts (Switch, Patch Panel, Power, OBM) by selecting devices from inventory.
+
+J) 4.1 Switches Layout
+- Select a Switch device (from Inventory) then render a Ports table.
+Ports table columns:
+- Port (number or label)
+- Connected Device (combobox from Inventory)
+- Device Port (text)
+- Status (Up / Down / NC)
+- Commentaries (text)
+Actions:
+- Add port row, bulk add ports via “Template by model” (auto-create 24/48 ports if applicable).
+- Duplicate switch layout for another switch device.
+
+K) 4.2 Patch Panel Layout
+- Similar to switch layout but for patch panels:
+Columns:
+- PP Port
+- Local Device
+- Remote Device
+- Status
+- Commentaries
+Add/remove rows, validations for missing endpoints.
+
+L) 4.3 PDU/UPS Layout
+- Power mapping layout:
+Columns:
+- PDU/UPS Port
+- Connected Device (from Inventory)
+- Status (On / Off / Fault / Unknown)
+- Commentaries
+Use Beam 3 status chips and icons.
+
+M) 4.4 OBM Layout (If applicable)
+- Detect if OBM exists in inventory; if not, show empty state “No OBM device registered.”
+If yes:
+- OBM header: OBM device selector + “OBM Antenna Picture” upload (LEO box).
+- Ports table:
+  - Port
+  - Device (from Inventory)
+  - Status (Reachable / Not reachable / NC)
+  - Commentaries
+Include a quick action: “Mark Verified with NOC” (checkbox + timestamp).
+
+N) 5. Antennas Photo
+- Beam 3 table:
+  - Antenna (from services catalog)
+  - Location (text)
+  - View/Photo upload (image)
+Rules:
+- One unique photo per antenna; warn on duplicate reuse.
+
+O) 5.1 Antennas Location Layout (Main view)
+- Canvas with uploaded site plan.
+- Left panel lists antennas based on Services (and/or antenna catalog).
+- Each antenna item is a draggable marker with:
+  - Colored border
+  - Arrow pointer
+  - Antenna label (e.g., “KU VSAT 01”)
+- Save position based on arrow tip (X/Y normalized) and rotation.
+- Reset action.
+
+P) 5.2 Antennas Location Layout (Optional additional views)
+- Support adding multiple additional drawings (e.g., isometric).
+- For each drawing: drag antennas onto the view as above.
+- “Add antenna to this view” action that prompts antenna selection.
+
+Q) 5.3 Blockage Zone
+- For each antenna, provide “Add values” form:
+  - Satellite Azimuth (degrees)
+  - Blockage Start (degrees)
+  - Blockage End (degrees)
+- Generate an illustrative overlay (arc/sector) preview using Beam 3 visualization container style.
+- Provide “Reset blockage values”.
+- Store values per antenna and allow export of the illustration as SVG/PNG for reporting.
+
+R) 6. General Diagram
+- File upload area (supports vector/PDF) with preview viewer (zoom/pan).
+- Notes field + version label.
+- Guidance text: diagram should include connections (AC, RF, Network), labels, and standardized color coding.
+
+S) 7. Antennas Configuration
+- This is a flexible module (“Pending to define” in Excel): implement as
+  - Per-antenna configuration form (repeatable sections)
+  - Key/value grid + attachments + screenshots
+  - Export config as JSON
+- Provide placeholders and allow schema changes later.
+
+T) 8. CSC Audit
+- Checklist module with items and verification columns by role:
+  - Engineer
+  - Field Tech
+  - Project Manager
+  - GNOC
+- Each item has:
+  - Status (Yes-Verified / N/A / Pending)
+  - Comments text area
+  - Optional link buttons (SolarWinds, ServiceNow)
+- Provide “Mark all reviewed for my role” action and a summary panel of pending items.
+
+U) Generate / Report Generation
+- Report readiness dashboard:
+  - Section progress cards with % completion and “Go to missing fields”.
+  - Buttons:
+    - Generate PDF
+    - Generate editable report (DOCX/online doc)
+    - Export Inventory (XLSX/CSV)
+    - Export Evidence ZIP
+- Lock generation until minimum required sections are complete:
+  Site Info + Services + Inventory + at least one of (Antenna photos or Antenna layout).
+
+========================================================
+4) COMPLETION LOGIC (PROGRESS %)
+========================================================
+- Each section defines required fields; compute completion as (filled required / total required).
+- Include file upload requirements where applicable (photos/diagrams).
+- Overall completion is weighted:
+  Site Info (15%), Services (10%), Phones (10%), Racks (10%), Inventory (20%),
+  Switch/Patch/Power/OBM (15%), Antenna photos/layouts/blockage (15%), CSC Audit (5%).
+- Show warnings for inconsistencies (e.g., a device mapped to a rack that does not exist).
+
+========================================================
+5) EMPTY / ERROR / HELP STATES (Beam 3)
+========================================================
+- Every module must have a Beam 3 empty state with a single CTA.
+- Inline validation + top-of-page error summary for forms with multiple errors.
+- Add contextual help tooltips for technical fields (MAC address, BUC, azimuth, etc.).
+
+========================================================
+6) RESPONSIVE BEHAVIOR
+========================================================
+- Desktop: sidebar + content; tables full width; canvas uses large workspace.
+- Tablet: collapsible sidebar; canvas supports pinch zoom.
+- Mobile: stepper becomes top dropdown; tables become stacked cards; canvas remains usable with zoom/pan.
+
+Deliverables in Figma:
+- Full set of screens for each module above.
+- Beam 3 component usage everywhere (no custom UI).
+- A clickable prototype that follows the stepper workflow from Getting Started → Generate Report.
+- A small set of reusable page templates: “Form page”, “Table page”, “Canvas layout page”, “Checklist page”, “Report dashboard page”.
